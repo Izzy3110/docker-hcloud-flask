@@ -15,7 +15,10 @@ COPY requirements.txt .
 
 # Install dependencies and cache them in Docker layer
 RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt
+
+RUN pip uninstall -y bcrypt
+RUN pip install bcrypt==4.0.1
 
 # Copy the rest of the application
 COPY . .
