@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Hetzner Cloud Servers</h1>
+
+    {% for account_no, servers in servers_list.items() %}
+        <h2>Account: {{ account_no }}</h2>
+
+        <!-- Create Server Button for each account -->
+        <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createServerModal{{ account_no }}">
+            Create Server
+        </button>
+
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>IPv4 Address</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for server in servers %}
+                    <tr>
+                        <td>{{ server.id }}</td>
+                        <td>{{ server.name }}</td>
+                        <td>{{ server.public_net.ipv4.ip }}</td>
+                        <td>{{ server.created_delta }}</td>
+                        <td>
+                            <!-- Delete Button triggers modal -->
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#confirmDeleteModal"
+                                    data-server-id="{{ server.id }}"
+                                    data-account-no="{{ account_no }}"
+                                    data-server-name="{{ server.name }}">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">No servers available for this account</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Create Server Modal for this specific account -->
+        <div class="modal fade" id="createServerModal{{ account_no }}" tabindex="-1" aria-labelledby="createServerLabel{{ account_no }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createServerLabel{{ account_no }}">Create New Server for Account {{ account_no }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="createServerForm{{ account_no }}" method="POST" action="/create_server/{{ account_no }}">
+                            <div class="mb-3">
+                                <label for="serverName" class="form-label">Server Name</label>
+                                <input type="text" id="serverName" name="server_name" class="form-control" placeholder="Leave blank to auto-generate">
+
+                            </div>
+                            <div class="mb-3">
+                                <label for="serverType" class="form-label">Server Type</label>
+                                <select id="serverType{{ account_no }}" name="server_type" class="form-select" required>
+                                    <option value="">Loading...</option>
+                                </select>                                
+                            </div>
+                            <div class="mb-3">
+                                <label for="image" class="form-label">Image</label>
+                                <input type="text" id="image" name="image" class="form-control" required placeholder="debian-12" value="debian-12">
+                            </div>
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Location</label>
+                                <input type="text" id="location" name="location" class="form-control" required placeholder="fsn1" value="fsn1">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create Server</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Bootstrap 5 Delete Confirmation Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete server <strong id="serverName"></strong> from account <strong id="accountNo"></strong>?
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="POST">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Delete Modal Logic (already present)
+        var deleteModal = document.getElementById("confirmDeleteModal");
+        deleteModal.addEventListener("show.bs.modal", function (event) {
+            var button = event.relatedTarget;
+            var serverId = button.getAttribute("data-server-id");
+            var accountNo = button.getAttribute("data-account-no");
+            var serverName = button.getAttribute("data-server-name");
+    
+            document.getElementById("serverName").textContent = serverName;
+            document.getElementById("accountNo").textContent = accountNo;
+    
+            var deleteForm = document.getElementById("deleteForm");
+            deleteForm.action = "/delete_server/" + accountNo + "/" + serverId;
+        });
+    
+        // Load Server Types when Create Server Modal is shown
+        document.querySelectorAll('[id^="createServerModal"]').forEach(modal => {
+            modal.addEventListener("show.bs.modal", function () {
+                const accountNo = modal.id.replace("createServerModal", "");
+                const select = document.getElementById("serverType" + accountNo);
+    
+                if (!select.dataset.loaded) {
+                    fetch("/server_types")
+                        .then(response => response.json())
+                        .then(data => {
+                            select.innerHTML = ""; // clear loading option
+                            const types = data["server_types"];
+                            if (!types) throw new Error("Key 'server_types' not found in response");
+                            types.forEach(type => {
+                                const option = document.createElement("option");
+                                option.value = type;
+                                option.textContent = type;
+                                select.appendChild(option);
+                            });
+                            select.dataset.loaded = "true";
+                        })
+                        .catch(err => {
+                            select.innerHTML = '<option value="">Failed to load</option>';
+                            console.error("Error loading server types:", err);
+                        });
+                }
+            });
+        });
+    });
+    </script>
+    
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form, render_field, render_form_row %}
+
+{% block content %}
+    <h2>Login User</h2>
+    <form method="post">
+    {{ form.csrf_token }}
+    {{ render_form_row([form.email]) }}
+    {{ render_form_row([form.username]) }}
+    {{ render_form_row([form.password]) }}
+    {{ render_form_row([form.remember]) }}
+    {{ render_form_row([form.submit]) }}
+    </form>
+{% endblock %}

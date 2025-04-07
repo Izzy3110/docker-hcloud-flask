@@ -1,0 +1,20 @@
+system:
+  debug: False
+
+excluded_ips:
+  - "49.12.187.246"
+
+instance_config:
+  hetzner_00:
+    description: "development"
+    comment: "Hetzner Cloud K111 - Server Account"
+    token: HCLOUD_API_TOKEN
+    location_name: "sin"
+    create_range: [0, 10]
+
+  hetzner_01:
+    description: "managed"
+    comment: "Hetzner Cloud K109 - Managed Server Account"
+    token: HCLOUD_API_TOKEN_3
+    location_name: "sin"
+    create_range: [0, 5]
