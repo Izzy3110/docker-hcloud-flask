@@ -1,0 +1,44 @@
+services:
+  web:
+    build:
+      context: services/web
+      dockerfile: Dockerfile
+    container_name: hcloud-web
+    ports:
+      - "5005:5005"
+    env_file:
+      - .env.service.web
+    restart: always
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - db
+    entrypoint: [ "/wait-for-it.sh", "hcloud-db:3306", "--", "gunicorn", "--worker-class", "eventlet", "-w", "1", "-b", "0.0.0.0:5005", "services.web.wsgi:app" ]
+
+  redis:
+    image: redis:7-alpine
+    container_name: hcloud-redis
+    restart: always
+
+  phpmyadmin:
+      depends_on:
+        - db
+      container_name: hcloud-phpmyadmin
+      image: phpmyadmin/phpmyadmin
+      restart: always
+      ports:
+        - 8188:80
+      env_file:
+        - .env.service.phpmyadmin
+
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    container_name: hcloud-db
+    volumes:
+      - ./dbdata:/var/lib/mysql
+    ports:
+      - 3316:3306
+    env_file:
+      - .env.service.mariadb
