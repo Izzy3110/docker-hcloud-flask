@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <script type="text/javascript" charset="utf-8">
+        var socket = io();
+        let streams_element
+        $(document).ready(function() {
+
+                streams_element = document.getElementById('streams')
+                socket.on('connect', function() {
+                    socket.emit('my event', {data: 'I\'m connected!'});
+                });
+                socket.on('my event', function(message) {
+                console.log(message)
+                    let action = Object.keys(message).includes('action') ? message['action'] : ''
+                    let stream = Object.keys(message).includes('stream') ? message['stream'] : ''
+                    let streams_count = $(streams_element).find('div', {"data-type": "stream"}).length
+                    if(streams_count == 0) {
+                        let new_div = document.createElement('div')
+                        $(new_div).attr('data-type', 'stream')
+                        $(new_div).attr('stream', stream)
+                        $(new_div).attr('data-last-play', message["last_play"])
+                        let new_div_status = document.createElement('div')
+                        $(new_div).attr('data-status', 'playing')
+
+                        $(new_div).html(stream+":"+action)
+                        $(streams_element).append($(new_div))
+                    } else {
+                        let stream_element = $(streams_element).find('div', {"data-type": "stream", "stream": stream})
+
+                        if(action == "done") {
+                            $(stream_element).attr('data-last-done', message["last_done"])
+                        }
+                        if(action == "play") {
+                            $(stream_element).attr('data-last-play', message["last_play"])
+                        }
+                    }
+                });
+
+        })
+
+    </script>
+<h2>Streams</h2>
+    <div id="streams">
+
+    </div>
+{% endblock %}
