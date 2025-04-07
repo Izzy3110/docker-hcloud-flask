@@ -173,3 +173,6 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 dbdata/
+.env.service.web
+.env.service.phpmyadmin
+.env.service.mariadb
