@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import datetime
 import hcloud
 import humanize
@@ -10,10 +11,14 @@ from services.web.app.extensions.csrf import csrf
 from services.web.app.wyl import HetznerCloudManager
 from dotenv import load_dotenv
 
-load_dotenv('.env')
-
+load_dotenv('./../../.env.service.web')
 EXCLUDED_SERVER_NAMES = os.getenv('EXCLUDED_SERVER_NAMES_CS')
-exclude_name_list = EXCLUDED_SERVER_NAMES.split(",") if "," in EXCLUDED_SERVER_NAMES else [EXCLUDED_SERVER_NAMES]
+if EXCLUDED_SERVER_NAMES is None:
+    print("is None")
+    exclude_name_list = []
+    sys.exit(1)
+else:
+    exclude_name_list = EXCLUDED_SERVER_NAMES.split(",") if "," in EXCLUDED_SERVER_NAMES else [EXCLUDED_SERVER_NAMES]
 
 servers_bp = Blueprint('servers', __name__)
 

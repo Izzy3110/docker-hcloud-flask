@@ -18,7 +18,7 @@ from services.web.app.blueprints.obs import obs_bp
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'secret!'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://localuser:localpass@db:3306/localdb'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://localuser:localpass@127.0.0.1:3306/localdb'
     # serve locally for faster and offline development
     app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 
@@ -34,7 +34,7 @@ def create_app():
     app.config['BOOTSTRAP_BOOTSWATCH_THEME'] = 'darkly'
 
     app.config["TIMEZONE_NAME"] = os.getenv('TIMEZONE_NAME')
-
+    app.config["2FA_REQUIRED"] = False
     db.init_app(app)
     bootstrap.init_app(app)
     csrf.init_app(app)
@@ -57,7 +57,7 @@ def create_app():
         return Users.query.get(int(user_id))
 
     with app.app_context():
-        # db.drop_all()
+        db.drop_all()
         db.create_all()
 
     Migrate(app, db)
