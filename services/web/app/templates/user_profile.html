@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  .dsp_none {
+    display: none;
+  }
+</style>
+<script>
+
+    function get_2fa_qrcode() {
+    $("#setup_2fa_container").removeClass('dsp_none')
+    $.ajax({
+      url: "/api/setup-2fa",
+      statusCode: {
+        404: function() {
+          console.log('not there')
+        }
+      },
+      success: function(data) {
+        $("#2fa_qrcode").attr('src', data)
+      }
+    })
+  }
+
+
+
+
+  $(document).ready(function() {
+
+
+
+    let two_fa_element = $("#two_factor_enabled")
+    $(two_fa_element).on('change', (event) => {
+      let changed_value = $(event.target).prop('checked')
+      console.log(changed_value)
+
+        $.ajax({
+          url: "/me",
+          method: 'POST',
+          dataType: 'application/x-www-form-urlencoded',
+          data: {
+            "two_factor_enabled": changed_value
+          },
+          statusCode: {
+            404: function() {
+                console.log("404:")
+            },
+            400: function(data) {
+              console.log(data)
+            }
+          },
+          success: function(data) {
+            console.log(data)
+          }
+
+      })
+    })
+  })
+
+  $("#validate_2fa_btn").on('click', function() {
+    console.log("clicked!")
+      totp_token = $("#totp_token").val()
+
+      $.ajax({
+              url: "/api/setup-2fa/verify",
+              method: 'POST',
+              dataType: 'application/x-www-form-urlencoded',
+              data: {
+                "totp_token": totp_token
+              },
+              success: function(data) {
+                console.log(data)
+              }
+
+          })
+
+    })
+</script>
+<div class="container-fluid">
+  <div class="row">
+  <div class="col-md-12"><hr></div>
+  <div class="col-md-12"><h2>Account</h2></div>
+  <div class="col-md-12"><hr></div>
+    <div class="row">
+      <div class="col-md-8">{{ form.two_factor_enabled.label }}</div>
+      <div class="col-md-4">
+        {% if not data.two_factor_authentication_setup_required %}
+          {{ form.two_factor_enabled(placeholder="two_factor_enabled", id="two_factor_enabled") }}
+        {% else %}
+          Setup 2FA first <button class="btn btn-primary" onclick="get_2fa_qrcode()">here</button>
+          {{ form.two_factor_enabled(placeholder="two_factor_enabled", id="two_factor_enabled", disabled="disabled") }}
+        {% endif %}</div>
+    </div>
+    <div class="col-md-12"><hr></div>
+  </div>
+  <div id="setup_2fa_container" class="row dsp_none">
+    <div class="col-md-12">
+      <div class="container-fluid">
+
+        <div class="row">
+          <div class="col-md-12">
+          Scan this QR-Code with your Google Authenticator App on your Smartphone!</div>
+        </div>
+        <div class="row">
+          <div class="col-md-12"><img src="" id="2fa_qrcode" alt="QRCode-2FA"></div>
+          </div>
+          <div class="row">
+            <div class="col-md-12"><input type="text" id="totp_token" placeholder="000000"></div>
+            </div>
+            <div class="row">
+              <div class="col-md-12"><input type="button" class="btn btn-primary" id="validate_2fa_btn" value="Validate"></div>
+              </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

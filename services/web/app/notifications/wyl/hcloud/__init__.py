@@ -44,8 +44,8 @@ class HetznerCloud:
             self.servers = self.client.servers.get_all()
             return self.servers
         except hcloud._exceptions.APIException as api_exceception:
-            print("'"+ api_exceception.code + "'")
-            print("'"+api_exceception.message+"'")
+            print("'" + api_exceception.code + "'")
+            print("'" + api_exceception.message + "'")
             return []
 
     def delete_server(self, delete_server):

@@ -1,6 +1,5 @@
 {% from 'bootstrap5/nav.html' import render_nav_item %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -23,6 +22,13 @@
     </style>
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            let token_input_element = $("#OTPToken")
+            $(token_input_element).focus()
+            console.log(token_input_element)
+        })
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
@@ -40,6 +46,7 @@
                     {{ render_nav_item('auth.register', 'Register') }}
                 {% else %}
                     {{ render_nav_item('servers.list_servers', 'Servers') }}
+                    {{ render_nav_item('general.user_profile', '[User Settings]') }}
                     {{ render_nav_item('auth.logout', 'Logout') }}
                 {% endif %}
             </ul>

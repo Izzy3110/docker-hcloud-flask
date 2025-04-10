@@ -1,12 +1,11 @@
-import pyotp
 from flask_sqlalchemy import SQLAlchemy
 from passlib.handlers.bcrypt import bcrypt
 from flask_login import UserMixin
 from sqlalchemy import func
-
+import pyotp
 from services.web.app.extensions.db import db
 
-db: SQLAlchemy
+db: SQLAlchemy = db
 
 
 class Servers(db.Model):
@@ -26,30 +25,24 @@ class Users(UserMixin, db.Model):
     password_hash = db.Column(db.String(128), nullable=False)  # Store hashed passwords
     pyotp_secret = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
-    is_two_factor_authentication_enabled = db.Column(db.Boolean(), default=True)
+    user_config_is_two_factor_authentication_enabled = db.Column(db.Boolean(), default=False)
+    two_factor_authentication_setup_required = db.Column(db.Boolean(), default=True)
 
-    def __init__(self, email, password, username=None):
+    defaults_user_config_is_two_factor_authentication_enabled = False
+
+    def __init__(self, email, password, username=None, two_factor_authentication=None):
+        self.user_config_is_two_factor_authentication_enabled = \
+            self.defaults_user_config_is_two_factor_authentication_enabled \
+            if two_factor_authentication is None else two_factor_authentication
         self.email = email
         self.password_hash = self.hash_password(password)  # Hash password before storing
         self.username = username if username is not None else ""
         self.pyotp_secret = ""
-        self.is_two_factor_authentication_enabled = True
 
-    def is_otp_valid(self, user_otp):
-        # totp = pyotp.parse_uri(self.get_authentication_setup_uri())
+    def verify_2fa_token(self, token):
+        print(f"secret: {self.pyotp_secret}")
         totp = pyotp.TOTP(self.pyotp_secret)
-        print(totp.now())
-        print(user_otp)
-        return totp.verify(user_otp)
-
-    def generate_otp_token(self, interval=200):
-        # Generates a TOTP token based on the given secret and interval
-        totp = pyotp.TOTP(self.pyotp_secret, interval=interval)
-        return totp.now()
-
-    def regenerate_pyotp_secret(self):
-        self.pyotp_secret = pyotp.random_base32()
-        db.session.commit()
+        return totp.verify(token)
 
     @staticmethod
     def hash_password(password):

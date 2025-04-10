@@ -71,7 +71,7 @@ class HetznerCloudManager:
         # If no name is provided, generate one
         if not name:
             memory_gb = int(server_type_obj.memory)
-            image_name = f"{image_obj.name.replace('-','').replace('.','')}"
+            image_name = f"{image_obj.name.replace('-', '').replace('.', '')}"
             name = self.generate_server_name(f"{image_name}-{memory_gb}gb-{location}")
 
         server = self.servers.create(

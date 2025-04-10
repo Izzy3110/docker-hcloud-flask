@@ -1,10 +1,12 @@
 import os
 import time
-from notifications.wyl.hcloud import HetznerCloud
-from notifications.wyl.server_manager import create_and_install_server, clear_servers
-from notifications.wyl.ssh_manager import connect_to_server
-from notifications.wyl.logging import logger
-from notifications.wyl.notifications import notify
+
+from services.web.app.notifications.wyl.hcloud import HetznerCloud
+from services.web.app.notifications.wyl.notifications import notify
+from services.web.app.notifications.wyl.server_manager import clear_servers
+from services.web.app.wyl.logging import logger
+from services.web.app.wyl.server_manager import create_and_install_server
+from services.web.app.wyl.ssh_manager import connect_to_server
 
 NETSTAT_CHECK_VNC_COMMAND = "netstat -anpt | grep -i listen | grep 5901"
 
@@ -73,7 +75,7 @@ def handle_check(instance_config, excluded_ips):
                             content_lines = servers_lst_r.readlines()
                             if len(content_lines) > 0:
                                 for line in content_lines:
-                                    if server_ip in line and not ":ok" in line:
+                                    if server_ip in line and ":ok" not in line:
                                         edit_line_in_file("servers.lst", server_ip, ":ok")
 
             server_ok = len(ips_ok) == len(servers)
