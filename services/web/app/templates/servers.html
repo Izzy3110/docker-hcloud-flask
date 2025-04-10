@@ -64,7 +64,7 @@
 
                             </div>
                             <div class="mb-3">
-                                <label for="serverType" class="form-label">Server Type</label>
+                                <label for="serverType{{ account_no }}" class="form-label">Server Type</label>
                                 <select id="serverType{{ account_no }}" name="server_type" class="form-select" required>
                                     <option value="">Loading...</option>
                                 </select>                                
@@ -95,7 +95,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete server <strong id="serverName"></strong> from account <strong id="accountNo"></strong>?
+                Are you sure you want to delete server <strong data-id="serverName"></strong> from account <strong id="accountNo"></strong>?
             </div>
             <div class="modal-footer">
                 <form id="deleteForm" method="POST">
@@ -117,7 +117,7 @@
             var accountNo = button.getAttribute("data-account-no");
             var serverName = button.getAttribute("data-server-name");
     
-            document.getElementById("serverName").textContent = serverName;
+            $("strong[data-id='serverName']").textContent = serverName;
             document.getElementById("accountNo").textContent = accountNo;
     
             var deleteForm = document.getElementById("deleteForm");

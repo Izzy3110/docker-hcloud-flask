@@ -1,14 +1,14 @@
 import os
 import time
 import paramiko
-from wyl.logging import logger
-from wyl.ssh_manager import SSHManager
+from services.web.app.notifications.wyl.logging import logger
+from services.web.app.notifications.wyl.ssh_manager import SSHManager
 from hcloud.servers import Server
 
 username = 'root'
 
 
-def clear_servers(cloud_instance, del_location_name, no_delete_names=None, no_delete_ipv4=None):
+def clear_servers(cloud_instance, del_location_name, no_delete_names=None):
     do_not_delete_server_names = [
             "debian-4gb-fsn1-4"
         ] if no_delete_names is None else no_delete_names

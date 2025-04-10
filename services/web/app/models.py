@@ -1,15 +1,9 @@
-import pyotp
 from flask_sqlalchemy import SQLAlchemy
 from passlib.handlers.bcrypt import bcrypt
 from flask_login import UserMixin
 from sqlalchemy import func
 import pyotp
-import qrcode
-from io import BytesIO
-import base64
 from services.web.app.extensions.db import db
-
-
 
 db: SQLAlchemy = db
 
@@ -37,12 +31,13 @@ class Users(UserMixin, db.Model):
     defaults_user_config_is_two_factor_authentication_enabled = False
 
     def __init__(self, email, password, username=None, two_factor_authentication=None):
-        self.user_config_is_two_factor_authentication_enabled = self.defaults_user_config_is_two_factor_authentication_enabled if two_factor_authentication is None else two_factor_authentication
+        self.user_config_is_two_factor_authentication_enabled = \
+            self.defaults_user_config_is_two_factor_authentication_enabled \
+            if two_factor_authentication is None else two_factor_authentication
         self.email = email
         self.password_hash = self.hash_password(password)  # Hash password before storing
         self.username = username if username is not None else ""
         self.pyotp_secret = ""
-        # self.user_config_is_two_factor_authentication_enabled = True
 
     def verify_2fa_token(self, token):
         print(f"secret: {self.pyotp_secret}")

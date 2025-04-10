@@ -1,6 +1,7 @@
 import os
 import time
 import paramiko
+import qrcode
 from services.web.app.notifications.wyl.notifications import notify
 from services.web.app.wyl.logging import logger
 from services.web.app.wyl.ssh_manager import SSHManager
@@ -39,7 +40,6 @@ def generate_qr_code(data: str, folder: str = 'qrcodes_data', filename: str = "q
     # Save the image
     img.save(file_path)
     print(f"QR code saved at: {file_path}")
-
 
 
 def clear_servers(cloud_instance, del_location_name):

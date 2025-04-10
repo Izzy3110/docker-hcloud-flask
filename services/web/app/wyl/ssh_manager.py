@@ -87,7 +87,7 @@ def connect_to_server(ip, command):
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     # Load the private key
-    private_key : RSAKey = paramiko.RSAKey.from_private_key_file("privatekey-1271v3-open.openSSH")
+    private_key: RSAKey = paramiko.RSAKey.from_private_key_file("privatekey-1271v3-open.openSSH")
 
     try:
         logger.info(f"Connecting to {ip}...")

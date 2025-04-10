@@ -6,6 +6,7 @@ from wtforms.validators import DataRequired, Length, InputRequired
 class UserProfileForm(FlaskForm):
     two_factor_enabled = BooleanField('Two-Factor enabled')
 
+
 class TwoFactorForm(FlaskForm):
     otp = StringField('Enter OTP', validators=[
                       InputRequired(), Length(min=6, max=6)])

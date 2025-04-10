@@ -36,7 +36,7 @@ for k, v in hcloud_keys.items():
 @servers_bp.route('/server_types')
 def get_server_types():
     type_names = []
-    for account, manager in  hcloud_managers.items():
+    for account, manager in hcloud_managers.items():
         for server_type in manager.server_types.get_all():
             if server_type.name not in type_names:
                 type_names.append(server_type.name)

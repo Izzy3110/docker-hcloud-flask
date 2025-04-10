@@ -27,6 +27,7 @@ def totp_test():
         #     print(f"OTP-SECRET: {user.pyotp_secret}")
 
     except AttributeError as ae:
+        print(ae.args)
         user_email = session.get('email')
         # print(f"email: {user_email}")
 
@@ -42,7 +43,7 @@ def totp_test():
             return redirect(url_for('general.index'))
         return redirect(url_for("auth.login_2fa_form"))
     if len(user.pyotp_secret) == 0:
-       return redirect(url_for('auth.setup_2fa'))
+        return redirect(url_for('auth.setup_2fa'))
 
     return render_template("verify-2fa.html", form=twofactor_form)
 
@@ -55,6 +56,7 @@ def login_2fa_form():
         user = db.session.query(Users).filter_by(id=user_id).one_or_none()
 
     except AttributeError as ae:
+        print(ae.args)
         user_email = session.get('email')
         user = db.session.query(Users).filter_by(email=user_email).one_or_none()
     if request.method == 'POST':
@@ -240,6 +242,7 @@ def setup_2fa_verify_api():
 
             return jsonify({"success": True, "result": result})
     return jsonify({"success": False, "message": "no user"})
+
 
 @auth_bp.route("/setup-2fa")
 def setup_2fa():

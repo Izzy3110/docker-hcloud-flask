@@ -5,7 +5,7 @@ import urllib3
 
 from dotenv import load_dotenv
 
-from wyl.helpers import CookieHandler
+from services.web.app.notifications.wyl.helpers import CookieHandler
 
 # Load environment variables
 load_dotenv('.env')

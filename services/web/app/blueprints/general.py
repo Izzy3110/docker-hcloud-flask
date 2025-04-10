@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, current_app, redirect, url_for, request, session
+from flask import Blueprint, render_template, current_app, redirect, url_for, request
 from flask_login import current_user, login_required
 
 from services.web.app.extensions.csrf import csrf
@@ -13,11 +13,12 @@ general_bp = Blueprint('general', __name__)
 def index():
     print()
     print(current_app.config["2FA_REQUIRED"] == "True")
-    print(current_app.config["2FA_REQUIRED"] == True)
+    print(current_app.config["2FA_REQUIRED"] is True)
     print(current_app.config["2FA_REQUIRED"])
     print(isinstance(current_app.config["2FA_REQUIRED"], bool))
     print("####")
     return render_template("index.html")
+
 
 @csrf.exempt
 @general_bp.route('/me', methods=['GET', 'POST'])
